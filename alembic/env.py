@@ -1,10 +1,17 @@
 import asyncio
+import os
+import sys
 
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-import app.models  # noqa: F401 - registers all models onto Base.metadata
+# Make the project root (the folder holding app/) importable no matter which
+# directory alembic is invoked from. alembic.ini's prepend_sys_path = . covers
+# the normal case; this also covers deploys where the working directory differs.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(_file_))))
+
+import app.models  # noqa: E402,F401 - registers all models onto Base.metadata
 from app.core.config import settings
 from app.db.base import Base
 
