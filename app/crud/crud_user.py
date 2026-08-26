@@ -38,6 +38,11 @@ async def create_user(db: AsyncSession, user_in: UserCreate) -> User:
     return user
 
 
+async def delete_user(db: AsyncSession, user: User) -> None:
+    await db.delete(user)
+    await db.commit()
+
+
 async def update_user(db: AsyncSession, user: User, data: UserUpdate) -> User:
     if data.name is not None:
         user.name = data.name

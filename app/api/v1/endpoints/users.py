@@ -3,7 +3,7 @@ from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_admin, get_current_user
-from app.crud.crud_user import get_all_users, get_user_by_email, update_user
+from app.crud.crud_user import delete_user, get_all_users, get_user_by_email, update_user
 from app.db.session import get_db
 from app.models.user import User, UserRole
 from app.schemas.user import UserOut, UserUpdate
@@ -60,3 +60,13 @@ async def update_my_profile(
 
     user = await update_user(db, current_user, UserUpdate(**provided))
     return success(UserOut.model_validate(user), message="Profile updated")
+
+
+# ---------- permanently delete own account (App Store Guideline 5.1.1(v)) ----------
+@router.delete("/me")
+async def delete_my_account(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    await delete_user(db, current_user)
+    return success(None, message="Account deleted")
